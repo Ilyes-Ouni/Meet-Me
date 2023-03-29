@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Participant } from '../models/participant';
@@ -11,20 +11,43 @@ export class ParticipantService {
     return await this.participantModel.find().exec();
   }
 
-  async findOne(id: string): Promise<Participant> {
-    return this.participantModel.findById(id).exec();
+  async findOne(id: string): Promise<Participant | null> {
+    try{
+      return this.participantModel.findById(id).exec();
+    } catch (error) { 
+      return null
+    }
+  }
+      
+  async create(participant: Participant): Promise<Participant | null> {
+    try {
+      const existingParticipant = await this.participantModel.findOne({ conferenceID: participant.conferenceID, email: participant.email });
+      
+      if (existingParticipant) return null;
+      const createdParticipant = new this.participantModel(participant);
+      return await createdParticipant.save();
+    } catch (error) {
+        throw new HttpException('Server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  async create(user: Participant): Promise<Participant> {
-    const createdUser = new this.participantModel(user);
-    return createdUser.save();
-  }
+  async update(id: string, participant: Participant): Promise<Participant | null> {
+    try{
+      const existingParticipant = await this.participantModel.findById(id);
 
-  async update(id: string, user: Participant): Promise<Participant> {
-    return this.participantModel.findByIdAndUpdate(id, user, { new: true }).exec();
+      if(!existingParticipant) return null
+      let result = await existingParticipant.updateOne(participant);
+      return result 
+    } catch (error) { 
+      throw new HttpException('Server error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async delete(id: string): Promise<any> {
-    return this.participantModel.findByIdAndDelete(id).exec();
+    try{
+      return await this.participantModel.findByIdAndRemove(id).exec();
+    } catch (error) { 
+      return null
+    }
   }
 }
