@@ -9,7 +9,7 @@ export class Participant extends Document {
   @Prop({ required: true })
   lastname: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   email: string;
 
   @Prop({ required: true })
@@ -17,6 +17,15 @@ export class Participant extends Document {
 
   @Prop({ required: true })
   phone_number: number;
+
+  @Prop({ required: true })
+  region: number;
+
+  @Prop({ required: true })
+  city: number;
+
+  @Prop({ required: true })
+  conferenceID: number;
 }
 
 export const ParticipantSchema = SchemaFactory.createForClass(Participant);
