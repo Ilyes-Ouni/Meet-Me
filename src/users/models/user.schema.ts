@@ -10,30 +10,18 @@ export const UserSchema = new mongoose.Schema({
     required: true,
   },
   phone_number: {
-    type: String,
+    type: Number,
     required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: false,
   },
   password: {
     type: String,
     required: true,
-  },
-  createdAt: {
-      type: Date,
-      default: Date.now,
-   },
-  createdBy: {
-      type: String,
-      required: true,
-   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+  }
 });
 
 export interface User extends mongoose.Document {
@@ -43,7 +31,4 @@ export interface User extends mongoose.Document {
   password: string;
   phone_number: number;
   Birthdate: Date;
-  createdAt: Date;
-  createdBy: string
-  updatedAt: Date;
 }
