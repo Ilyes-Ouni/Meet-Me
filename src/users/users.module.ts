@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SharedModule } from 'src/shared/shared.module';
 import { UsersController } from './controllers/users.controller';
-import { UserSchema } from './models/user.schema';
+import { UserSchema } from '../shared/models/user.schema';
 import { UsersService } from './services/users.service';
 require('dotenv').config();
 
@@ -17,5 +17,6 @@ require('dotenv').config();
   ],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [ UsersService]
 })
 export class UsersModule {}

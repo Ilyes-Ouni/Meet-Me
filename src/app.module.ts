@@ -3,10 +3,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { SpeakersModule } from './speakers/speakers.module';
 import { SharedModule } from './shared/shared.module';
-import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from './users/users.module';
 import { ParticipantsModule } from './participants/participants.module';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
+import { ConferenceModule } from "./conference/conference.module";
 require('dotenv').config();
 
 @Module({
@@ -21,13 +24,14 @@ require('dotenv').config();
         useUnifiedTopology: true,
       }),
     }),
+    AuthModule,
     SpeakersModule, 
     SharedModule, 
-    AuthModule, 
     UsersModule, 
-    ParticipantsModule
+    ParticipantsModule,
+    ConferenceModule
   ],
-  controllers: [AppController],
-  providers: [],
+  controllers: [AppController, AuthController],
+  providers: [AuthService],
 })
 export class AppModule {}

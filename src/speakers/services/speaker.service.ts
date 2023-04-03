@@ -1,94 +1,55 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Speaker } from '../models/speaker.schema';
-import { Db, ObjectId } from 'mongodb';
-import { MongoClientService } from 'src/shared/services/mongo-client.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class SpeakerService {
-    constructor(private mongoService: MongoClientService){}
+    constructor(@InjectModel('Speaker') private readonly speakerModel: Model<Speaker>){}
     
-    async findAll():Promise<typeof Speaker[] | object>{
-        try {
-            const db: Db = this.mongoService.getDb();
-            const collection = db.collection("speakers");
+    async findAll(): Promise<Speaker[]> {
+      return await this.speakerModel.find().exec();
+    }
+  
 
-            const speakers = await collection.find().toArray();
-            return speakers;
-        } catch (error) { 
-            throw new HttpException({
-              status: HttpStatus.FORBIDDEN,
-              error: 'Error Occured',
-            }, HttpStatus.FORBIDDEN, {
-              cause: error
-            });
-        }
+    async findOne(id: string): Promise<Speaker | null> {
+      try{
+        return this.speakerModel.findById(id).exec();
+      } catch (error) { 
+        return null
+      }
     }
 
-    async findOne(speakerID): Promise<typeof Speaker | object> {
-        try {
-            const db: Db = this.mongoService.getDb();
-            const collection = db.collection("speakers");
-
-            const speaker = await collection.findOne({ _id: new ObjectId(speakerID) });
-            return speaker
-        } catch (error) { 
-            throw new HttpException({
-              status: HttpStatus.FORBIDDEN,
-              error: 'Error Occured',
-            }, HttpStatus.FORBIDDEN, {
-              cause: error
-            });
-        }
-    }
-    
-    async create(speaker: Speaker): Promise<number> {
-        try {
-            const db: Db = this.mongoService.getDb();
-            const collection = db.collection("speakers");
-            collection.insertOne(speaker)
-            return 1
-        } catch (error) { 
-            throw new HttpException({
-              status: HttpStatus.FORBIDDEN,
-              error: 'Error Occured',
-            }, HttpStatus.FORBIDDEN, {
-              cause: error
-            });
-        }
+    async create(speaker: Speaker): Promise<Speaker | null> {
+      try {
+        const existingSpeaker = await this.speakerModel.findOne({ conferenceID: speaker.conferenceID });
+        
+        if (existingSpeaker) return null;
+        const createdParticipant = new this.speakerModel(speaker);
+        return await createdParticipant.save();
+      } catch (error) {
+          throw new HttpException('Server error', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
 
-    async update(id, speaker){
-        try {
-            const db: Db = this.mongoService.getDb();
-            const collection = db.collection("speakers");
-            collection.updateOne({ _id: new ObjectId(id) }, { $set: speaker })
 
-            return 1
-        } catch (error) { 
-            throw new HttpException({
-              status: HttpStatus.FORBIDDEN,
-              error: 'Error Occured',
-            }, HttpStatus.FORBIDDEN, {
-              cause: error
-            });
-        }
-    }
+async update(id: string, speaker: Speaker): Promise<Speaker | null> {
+  try{
+    const existingSpeaker = await this.speakerModel.findById(id);
 
-    
-    async delete(speakerID){
-        try {
-            const db: Db = this.mongoService.getDb();
-            const collection = db.collection("speakers");
+    if(!existingSpeaker) return null
+    let result = await existingSpeaker.updateOne(speaker);
+    return result 
+  } catch (error) { 
+    throw new HttpException('Server error', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}
 
-            collection.deleteOne({ _id: new ObjectId(speakerID) });
-            return 1
-        } catch (error) { 
-            throw new HttpException({
-              status: HttpStatus.FORBIDDEN,
-              error: 'Error Occured',
-            }, HttpStatus.FORBIDDEN, {
-              cause: error
-            });
-        }
-    }
+async delete(id: string): Promise<any> {
+  try{
+    return await this.speakerModel.findByIdAndRemove(id).exec();
+  } catch (error) { 
+    return null
+  }
+}
 }

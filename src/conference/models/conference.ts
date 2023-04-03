@@ -2,30 +2,34 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 @Schema({ timestamps: { createdAt: 'registeredAt' } })
-export class Participant extends Document {
+export class Conference extends Document {
+ 
   @Prop({ required: true })
-  firstname: string;
+  nom: string;
 
   @Prop({ required: true })
-  lastname: string;
+  capacite: number;
 
   @Prop({ required: true })
-  email: string;
+  dateDebut: Date;
 
   @Prop({ required: true })
-  birthdate: number;
+  startTime: number;
 
   @Prop({ required: true })
-  phone_number: number;
+  endTime: number;
 
   @Prop({ required: true })
-  region: number;
+  topic: String;
 
   @Prop({ required: true })
-  city: number;
+  duree: number;
 
   @Prop({ required: true })
-  conferenceID: number;
+  pays: String;
+
+  @Prop({ required: true })
+  region: String;
 }
 
-export const ParticipantSchema = SchemaFactory.createForClass(Participant);
+export const ConferenceSchema = SchemaFactory.createForClass(Conference);
