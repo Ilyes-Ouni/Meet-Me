@@ -1,10 +1,7 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import * as jwt from 'jsonwebtoken';
-import { JwtPayload } from 'jsonwebtoken';
-import { User } from 'src/shared/models/user.schema';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -20,4 +17,5 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     if (!user) return null
     return user;
   }
+
 }
