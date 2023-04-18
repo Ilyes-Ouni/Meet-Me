@@ -21,7 +21,7 @@ export class Speaker extends Document {
   @Prop({required: true})
   About: string;
 
-  @Prop({required: true})
+  @Prop({required: false})
   age: number;
 
   @Prop({required: true})

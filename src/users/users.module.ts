@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SharedModule } from 'src/shared/shared.module';
 import { UsersController } from './controllers/users.controller';
 import { UserSchema } from '../shared/models/user.schema';
 import { UsersService } from './services/users.service';
+import { AuthModule } from 'src/auth/auth.module';
 require('dotenv').config();
 
 @Module({
@@ -13,7 +14,8 @@ require('dotenv').config();
       secret: process.env.SECRET_KEY,
    }),
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
-    SharedModule
+    SharedModule,
+    forwardRef(() => AuthModule),
   ],
   controllers: [UsersController],
   providers: [UsersService],
